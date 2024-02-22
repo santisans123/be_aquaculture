@@ -27,10 +27,10 @@ async function getAllPools(req: Request, res: Response) {
         data: req.body,
         message: 'Pengguna dengan Token yang digunakan tidak ditemukan!'
       })
-    )
+    );
   }
 
-  const pools = await Pools.find({poolsName: { $regex: new RegExp(poolsName, 'i') }, userId, ...NOT_ARCHIVED});
+  const pools = await Pools.find({ poolsName: { $regex: new RegExp(poolsName, 'i') }, userId, ...NOT_ARCHIVED });
   if (!pools.length) {
     return res.status(404).send(
       message({
@@ -40,7 +40,7 @@ async function getAllPools(req: Request, res: Response) {
       })
     );
   }
-  
+
   return res.send(
     message({
       statusCode: 200,

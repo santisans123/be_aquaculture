@@ -1,8 +1,18 @@
 import express from 'express';
-import { createPondsByUser, deletePondsById, getAllPonds, getPondsByCityId, getPondsById, getPondsByProvinceId, updatePondsByUser } from '../controllers/ponds';
+import {
+  createPondsByUser,
+  deletePondsById,
+  getAllPonds,
+  getAllNoQueryPonds,
+  getPondsByCityId,
+  getPondsById,
+  getPondsByProvinceId,
+  updatePondsByUser
+} from '../controllers/ponds';
 const router = express.Router();
 
 router.get('/', getAllPonds);
+router.get('/all-ponds', getAllNoQueryPonds);
 router.get('/pondsId/:pondsId', getPondsById);
 router.get('/cityId/:cityId', getPondsByCityId);
 router.get('/provinceId/:provinceId', getPondsByProvinceId);

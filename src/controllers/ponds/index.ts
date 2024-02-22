@@ -1,4 +1,5 @@
 export { getAllPonds } from './get-all.ponds.controllers';
+export { getAllNoQueryPonds } from './get-all-noquery.ponds.controllers';
 export { getPondsById } from './get-by-id.ponds.controllers';
 export { deletePondsById } from './delete-by-id.ponds.controllers';
 export { getPondsByProvinceId } from './get-by-province-id.ponds.controllers';
