@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
-import { Ponds, Users } from '../../models';
+import { Ponds, Users, City } from '../../models';
 import { extractToken } from '../../utils';
 import message from '../../views/message';
 
@@ -18,7 +18,9 @@ async function getAllNoQueryPonds(req: Request, res: Response) {
       );
     }
 
-    const getAllPonds = await Ponds.find();
+    const getAllPonds = await Ponds.find()
+      .populate('userId')
+      .populate({ path: 'cityId', populate: { path: 'provinceId' } });
     if (!getAllPonds) {
       return res.status(404).send(
         message({
@@ -28,7 +30,6 @@ async function getAllNoQueryPonds(req: Request, res: Response) {
         })
       );
     }
-
     res.send(
       message({
         statusCode: 200,
