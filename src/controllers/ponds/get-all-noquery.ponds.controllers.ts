@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
-import { Ponds, Users, City } from '../../models';
+import { Ponds, Users } from '../../models';
 import { extractToken } from '../../utils';
 import message from '../../views/message';
 

@@ -8,7 +8,7 @@ import {
 } from '../controllers/users';
 const router = express.Router();
 
-router.get('/halo', getUserProfiles);
+router.get('/', getUserProfiles);
 router.get('/all', getAllUserProfiles);
 router.put('/', userUpdate);
 router.put('/apiKey', apiKeyUpdate);
