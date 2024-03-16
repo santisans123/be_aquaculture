@@ -5,16 +5,18 @@ import {
   getPoolsByCityId,
   getPoolsById,
   getPoolsByPondsId,
+  getPoolsByPondsIdAdmin,
   getPoolsByProvinceId,
   updatePoolByUser,
   deletePoolsById,
-  bindPoolsWithDevice,
+  bindPoolsWithDevice
 } from '../controllers/pools';
 const router = express.Router();
 
 router.get('/', getAllPools);
 router.get('/poolsId/:poolsId', getPoolsById);
 router.get('/pondsId/:pondsId', getPoolsByPondsId);
+router.get('/pondsIdAdmin/:pondsId', getPoolsByPondsIdAdmin);
 router.get('/cityId/:cityId', getPoolsByCityId);
 router.get('/provinceId/:provinceId', getPoolsByProvinceId);
 router.post('/', [createPoolsByUser]);
