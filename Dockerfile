@@ -1,6 +1,6 @@
 FROM node:14
 WORKDIR /usr/src/app
-COPY package.json package*.json ./
-RUN yarn install
+COPY package.json ./
+RUN npm i fsevents@latest -f --save-optional
 COPY . .
-CMD [ "yarn", "start" ]
+CMD [ "npm", "start" ]
