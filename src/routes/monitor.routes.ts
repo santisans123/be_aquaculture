@@ -6,8 +6,10 @@ import {
   postMonitor,
   updateMonitor,
   postMonitorByKey,
-  getAllMonitorToday
+  getAllMonitorToday,
+  configureMQTTSubscription
 } from '../controllers/monitoring';
+
 const router = express.Router();
 
 router.get('/poolsId/:poolsId', getAllMonitor);
@@ -15,6 +17,7 @@ router.get('/poolsId/:poolsId/today', getAllMonitorToday);
 router.get('/:recordId', getOneMonitor);
 router.post('/poolsId/:poolsId', [postMonitor]);
 router.post('/apiKey/:apiKey/deviceName/:deviceName', [postMonitorByKey]);
+router.post('/apiKey/configure-mqtt', [configureMQTTSubscription]);
 router.put('/:recordId', [updateMonitor]);
 router.delete('/:recordId', [deleteOneMonitor]);
 
