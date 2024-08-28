@@ -17,12 +17,12 @@ class MQTTHandler {
   private static instance: MQTTHandler;
   private mqttClient: mqtt.MqttClient | null = null;
 
-  private static readonly CertificateOptions = {
-    ca: caCert,
-    cert: clientCert,
-    key: clientKey,
-    rejectUnauthorized: true,
-  };
+  // private static readonly CertificateOptions = {
+  //   ca: caCert,
+  //   cert: clientCert,
+  //   key: clientKey,
+  //   rejectUnauthorized: true,
+  // };
 
   public static getInstance(): MQTTHandler {
     if (!MQTTHandler.instance) {
@@ -37,13 +37,13 @@ class MQTTHandler {
       return;
     }
 
-    this.mqttClient = mqtt.connect(broker.brokerUrl, {
-      username: broker.username,
-      password: broker.password,
-      ca: MQTTHandler.CertificateOptions.ca,
-      cert: MQTTHandler.CertificateOptions.cert,
-      key: MQTTHandler.CertificateOptions.key,
-      rejectUnauthorized: MQTTHandler.CertificateOptions.rejectUnauthorized,
+    this.mqttClient = mqtt.connect(MQTT_Broker_url, {
+      username: MQTT_Username,
+      password: MQTT_Password
+      // ca: MQTTHandler.CertificateOptions.ca,
+      // cert: MQTTHandler.CertificateOptions.cert,
+      // key: MQTTHandler.CertificateOptions.key,
+      // rejectUnauthorized: MQTTHandler.CertificateOptions.rejectUnauthorized,
     });
 
     this.mqttClient.on('connect', () => {

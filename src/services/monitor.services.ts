@@ -28,9 +28,9 @@ export async function subscribeToDynamicTopic(topic: string): Promise<void> {
   const mqttHandler = MQTTHandler.getInstance();
 
   const brokerConfig = {
-    brokerUrl: process.env.MQTT_BROKER_URL!,
-    username: process.env.MQTT_USERNAME_SERVER!,
-    password: process.env.MQTT_PASSWORD_SERVER!,
+    brokerUrl: process.env.MQTT_BROKER_URL,
+    username: process.env.MQTT_USERNAME_SERVER,
+    password: process.env.MQTT_PASSWORD_SERVER,
   };
 
   mqttHandler.connectToBroker(brokerConfig);
