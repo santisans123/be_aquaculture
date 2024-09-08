@@ -9,12 +9,15 @@ import WebSocket from './src/core/ws.core';
 import coreRoutes from './src/core/routes';
 import connectDatabase from './src/databases/connect.database';
 // import {provinceAndCitiesInit} from './src/utils';
+import { initializeServices } from './src/utils/initService';
+
 dotEnv.config();
 
 createApp(app);
 coreRoutes(app);
 connectDatabase(process.env.MONGOURI!);
 WebSocket(app);
+initializeServices();
 
 // provinceAndCitiesInit()
 

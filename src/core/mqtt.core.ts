@@ -1,83 +1,41 @@
-import mqtt from 'mqtt';
-import { caCert, clientCert, clientKey } from '../utils/credentials';
+import mqtt, { MqttClient } from 'mqtt';
+import { Monitor, Pools, Users } from '../models/index';
 import { AppLogger } from '../logs/error.logs';
-import { saveMonitorData } from '../services/monitor.services';
+import { postMonitorByTopic } from '../controllers/monitoring';
+import { postSamplebyTopic } from '../controllers/sampling';
 
-const MQTT_Broker_url = process.env.MQTT_BROKER_URL;
-const MQTT_Username = process.env.MQTT_USERNAME_SERVER;
-const MQTT_Password = process.env.MQTT_PASSWORD_SERVER;
+class MQTTService{
+  private static instance: MQTTService;
+  private mqttClient: MqttClient | null = null;
 
-interface BrokerConfig {
-  brokerUrl: string;
-  username: string;
-  password: string;
-}
+  private constructor(){
 
-class MQTTHandler {
-  private static instance: MQTTHandler;
-  private mqttClient: mqtt.MqttClient | null = null;
-
-  // private static readonly CertificateOptions = {
-  //   ca: caCert,
-  //   cert: clientCert,
-  //   key: clientKey,
-  //   rejectUnauthorized: true,
-  // };
-
-  public static getInstance(): MQTTHandler {
-    if (!MQTTHandler.instance) {
-      MQTTHandler.instance = new MQTTHandler();
-    }
-    return MQTTHandler.instance;
   }
 
-  public connectToBroker(broker: BrokerConfig): void {
-    if (this.mqttClient && this.mqttClient.connected) {
-      AppLogger.info('MQTT Client already connected.');
-      return;
+  public static getInstance(): MQTTService {
+    if (!MQTTService.instance) {
+      MQTTService.instance =new MQTTService();
     }
+    return MQTTService.instance;
+  }
 
-    this.mqttClient = mqtt.connect(MQTT_Broker_url, {
-      username: MQTT_Username,
-      password: MQTT_Password
-      // ca: MQTTHandler.CertificateOptions.ca,
-      // cert: MQTTHandler.CertificateOptions.cert,
-      // key: MQTTHandler.CertificateOptions.key,
-      // rejectUnauthorized: MQTTHandler.CertificateOptions.rejectUnauthorized,
-    });
+  public async init() {
+    const mqttOptions = {
+      host: process.env.MQTT_BROKER_URL,
+      port: 8883,
+      username: process.env.MQTT_USERNAME_SERVER,
+      password: process.env.MQTT_PASSWORD_SERVER,
+    };
+
+    this.mqttClient = mqtt.connect(mqttOptions);
 
     this.mqttClient.on('connect', () => {
-      AppLogger.info('Connected to MQTT broker.');
+      this.mqtt_handler(this.mqttClient!);
     });
 
-    this.mqttClient.on('error', this.onError.bind(this));
-    this.mqttClient.on('reconnect', this.onReconnect.bind(this));
-    this.mqttClient.on('close', this.onClose.bind(this));
-  }
-
-  public subscribeToTopic(topic: string): void {
-    if (!this.mqttClient) {
-      AppLogger.error('MQTT Client is not connected.');
-      return;
-    }
-
-    this.mqttClient.subscribe(topic, (err) => {
-      if (err) {
-        AppLogger.error(`Failed to subscribe to topic ${topic}:`, err.message);
-      } else {
-        AppLogger.info(`Subscribed to topic ${topic}`);
-      }
-    });
-
-    this.mqttClient.on('message', async (topic: string, message: Buffer) => {
-      try {
-        const data = JSON.parse(message.toString());
-        await saveMonitorData(data.apiKey, data.deviceName, data);
-        AppLogger.info(`Data from topic ${topic} saved to database.`);
-      } catch (error) {
-        AppLogger.error('Failed to save data from MQTT message:', error);
-      }
-    });
+    this.mqttClient.on('error', (error) => this.onError(error));
+    this.mqttClient.on('reconnect', () => this.onReconnect());
+    this.mqttClient.on('close', () => this.onClose());
   }
 
   private onError(error: Error): void {
@@ -91,6 +49,58 @@ class MQTTHandler {
   private onClose(): void {
     AppLogger.warn('Disconnected from MQTT broker.');
   }
+
+  public async mqtt_handler(client: MqttClient) {
+    try {
+      const users = await Users.find({ isArchived: false });
+
+      for (const user of users) {
+        const pools = await Pools.find({ userId: user._id, isArchived: false });
+
+        for (const pool of pools) {
+          if (pool.deviceName && pool.isActived) {
+            const monitoringTopic = `${pool.deviceName}/${user.apiKey}/monitoring`;
+            const samplingTopic = `${pool.deviceName}/${user.apiKey}/sampling`;
+
+            client.subscribe(monitoringTopic, (err) => {
+              if (err) {
+                AppLogger.error(`Error subscribing to ${monitoringTopic}:`, err);
+              } else {
+                AppLogger.info(`Subscribed to ${monitoringTopic}`);
+              }
+            });
+
+            client.subscribe(samplingTopic, (err) => {
+              if (err) {
+                AppLogger.error(`Error subscribing to ${samplingTopic}:`, err);
+              } else {
+                AppLogger.info(`Subscribed to ${samplingTopic}`);
+              }
+            });
+
+            client.on('message', async (topic, message) => {
+              try {
+                const data = JSON.parse(message.toString());
+                if (topic === monitoringTopic) {
+                  await postMonitorByTopic(user.apiKey, pool.deviceName, data);
+                } else if (topic === samplingTopic) {
+                  await postSamplebyTopic(user.apiKey, pool.deviceName, data);
+                }
+              } catch (error) {
+                AppLogger.error(`Error processing message from ${topic}:`, error);
+              }
+            });
+          }
+        }
+      }
+    } catch (error) {
+      AppLogger.error('Error in mqtt_handler:', error);
+    }
+  }
+
 }
 
-export default MQTTHandler;
+const mqttService = MQTTService.getInstance();
+mqttService.init();
+
+export default mqttService;

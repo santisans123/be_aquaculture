@@ -5,3 +5,4 @@ export { postMonitor } from './post.monitor.controllers';
 export { postMonitorByKey } from './post-by-key.monitoring.controllers';
 export { updateMonitor } from './update-one.record.controllers';
 export { deleteOneMonitor } from './delete-one.monitor.controllers';
+export { postMonitorByTopic } from './post-by-topic.monitoring.controllers'

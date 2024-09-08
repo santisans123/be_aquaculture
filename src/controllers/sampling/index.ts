@@ -5,3 +5,4 @@ export { postSample } from './post.sample.controllers';
 export { postSampleByKey } from './post-by-key.sample.controllers';
 export { updateSample } from './update-one.sample.controllers';
 export { deleteOneSample } from './delete-one.sample.controllers';
+export { postSamplebyTopic } from './post-by-topic.sampling.controllers';
