@@ -8,9 +8,10 @@ router.get('/provinceId/:provinceId', getCityByProvinceId);
 // router.post('/', [postRecord]);
 
 router.stack.forEach(function (middleware) {
-  console.log(
-    '[routes]: ' + middleware.route.stack[0].method.toUpperCase() + ' /api/v1/cities' + middleware.route.path
-  );
+  if (middleware.route) {
+    console.log(
+      '[routes]: ' + middleware.route.stack[0].method.toUpperCase() + ' /api/v1/cities' + middleware.route.path
+  );}
 });
 
 export { router };

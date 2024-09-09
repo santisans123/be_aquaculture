@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Joi from 'joi';
-import { joiObjectId } from 'ts-joi-objectid';
+import joiObjectId = require('joi-objectid');
 
 interface ObjectId {
   id: string;
 }
 
-const MyJoi = joiObjectId(Joi);
+const objectId = joiObjectId(Joi);
 
 function objectIdValidator(id: string, title: string, isId: boolean) {
   const schema = Joi.object<ObjectId>({
-    id: MyJoi()
+    id:objectId()
       .required()
       .error((errors: Joi.ErrorReport[]): any => {
         errors.forEach((err) => {

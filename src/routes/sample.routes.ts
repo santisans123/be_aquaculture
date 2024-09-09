@@ -19,9 +19,10 @@ router.put('/:recordId', [updateSample]);
 router.delete('/:recordId', [deleteOneSample]);
 
 router.stack.forEach(function (middleware) {
-  console.log(
-    '[routes]: ' + middleware.route.stack[0].method.toUpperCase() + ' /api/v1/sample' + middleware.route.path
-  );
+  if (middleware.route) {
+    console.log(
+      '[routes]: ' + middleware.route.stack[0].method.toUpperCase() + ' /api/v1/sample' + middleware.route.path
+  );}
 });
 
 export { router };

@@ -66,6 +66,7 @@ class MQTTService{
               if (err) {
                 AppLogger.error(`Error subscribing to ${monitoringTopic}:`, err);
               } else {
+                console.log(`Subscribed to ${monitoringTopic}`)
                 AppLogger.info(`Subscribed to ${monitoringTopic}`);
               }
             });
@@ -74,6 +75,7 @@ class MQTTService{
               if (err) {
                 AppLogger.error(`Error subscribing to ${samplingTopic}:`, err);
               } else {
+                console.log(`Subscribed to ${samplingTopic}`)
                 AppLogger.info(`Subscribed to ${samplingTopic}`);
               }
             });
