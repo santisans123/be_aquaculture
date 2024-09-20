@@ -2,38 +2,35 @@ import { Sample, Pools, Users } from '../../models/index';
 import { validatePostRecord } from '../../validators';
 import { AppLogger } from '../../logs/error.logs';
 
-async function postSamplebyTopic(apiKey: string, deviceName: string, data: any) {
+async function postSamplebyTopic(deviceName: string, apiKey: string, data: any) {
   try {
-    const user = await Users.findOne({ apiKey: apiKey });
+    console.log(`Processing monitoring data for device ${deviceName} with apiKey ${apiKey}`);
+    console.log('Received data:', data);
+
+    const user = await Users.findOne({ apiKey });
     if (!user) {
-      AppLogger.warn(`User not found for API Key: ${apiKey}`);
+      console.log(`No user found with apiKey ${apiKey}`);
       return;
     }
 
-    const pool = await Pools.findOne({ deviceName: deviceName, userId: user._id });
+    const pool = await Pools.findOne({ deviceName, userId: user._id });
     if (!pool) {
-      AppLogger.warn(`Pool not found for device: ${deviceName}`);
+      console.log(`No pool found for device ${deviceName} and user ${user._id}`);
       return;
     }
 
-    const { error } = validatePostRecord(data);
-    if (error) {
-      AppLogger.error(`Invalid sample data: ${error.message}`);
-      return;
-    }
-
-    const record = new Sample({
-      ...data,
-      userId: user._id,
+    const samplingData = new Sample({
       poolsId: pool._id,
+      salinity: data.salinity,
+      acidity: data.acidity,
+      oxygen: data.oxygen,
+      temperature: data.temperature
     });
-    
-    const savedSample = await record.save();
-    AppLogger.info(`Sample data saved for pool: ${pool.poolsName}`);
 
-    return savedSample;
+    await samplingData.save();
+    console.log(`Sampling data saved for pool ${pool._id}`);
   } catch (error) {
-    AppLogger.error('Error saving sample data:', error);
+    AppLogger.error('Error handling sampling message:', error);
   }
 }
 

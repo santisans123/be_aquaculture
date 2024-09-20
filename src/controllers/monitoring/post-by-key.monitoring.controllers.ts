@@ -44,7 +44,7 @@ async function postMonitorByKey(req: Request, res: Response) {
   });
   
   const savedMonitor = await record.save();
-
+ 
   const ioEmitter = req.app.get('socketIo');
   ioEmitter.emit(`Monitor:${isPoolsExist._id}`, savedMonitor);
   
